@@ -16,14 +16,30 @@ Z9" и возвращает "A2-A1"
 
 1. CMake 3.10
 
-2. Все что Cmake потребует.(Например: MSYS MINGW32, ninja)
+2. Все, что Cmake потребует.(Например: MSYS MINGW32, ninja)
 
-#Запуск и параметры:#
+## Запуск и параметры:
 
 ```
 mkdir build
 cmake ..
 ninja
+./IdGen_test.exe
+```
+## Для Создания dll
+
+```
+cd shared
+mkdir build
+cmake ..
+ninja
+```
+## Для компиляции и запуска с созданной dll
+
+```
+cd ..
+gcc -Lbuild -o IdGen_test.exe IdGen_test.c -lIdGenLib
+cp SHARED/build/libIdGenLib.dll libIdGenLib.dll
 ./IdGen_test.exe
 ```
 

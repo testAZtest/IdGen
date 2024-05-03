@@ -42,4 +42,53 @@ gcc -Lbuild -o IdGen_test.exe IdGen_test.c -lIdGenLib
 cp SHARED/build/libIdGenLib.dll libIdGenLib.dll
 ./IdGen_test.exe
 ```
+## Методы
+
+Выполняет генерацию идентификаторов по указанным правилам с учетом "черного списка" для букв и цифр.
+Внутреннее состояние хранится в структуре IdGen_State_Mashine и представляет собой систему исчисления с переменным основанием. 
+Также там сохраняется тавлицы переходов (прямая и обратная) от цифробуквенных
+обозначений к числовым. Символы должны быть представлены в кодах ASCII. "Черные списки" задаются  пользователем
+ Методы:
+int keep_alnum(char *p, int len); - удаляет из входной строки все символы которые не являются цифрами и буквами
+  void upper(char *p, int len); - приводит буквы в верхний регистр
+
+int create_tables(char mode,int *table,char *reverse_table, int lt, char *black_list,int lb); - создает таблицы переходов на основе "черных списков" 
+	  Параметры: char mode - если это цифра то таблицы для цифр, эсли буква то таблица для букв int *table - прямая таблица char->int, char *reverse_table - обратная таблица int->char, для запрещенных символов
+   результат перехода -1,int lt - размера алфавита (максимальная длина таблицы для букв и цифр, char *black_list,int lb - собственно "черный список" нуль-терминированная строка и ее длина
+
+int init_IdGen_State_Mashine(IdGen_State_Mashine *ptr,char *string,int sl,char *black1,int len1,char *blackA,int lenA); - иниациализация машины состояний на которую указывает ptr посредством 
+начальной нуль-терменированной строки string длиной sl с учатом черных списков для цифр char *black1,int len1 и для букв char *blackA,int lenA 
+
+void run_IdGen_State_Mashine(IdGen_State_Mashine *ptr); - переход в новое состояние машины ptr
+
+int IdGen_sprintf(IdGen_State_Mashine *ptr,char *p,int len); - печать состояния во внутренниий буфер с разделителем '-'
+
+char * identificator_generation(IdGen_State_Mashine *ptr,char *in); - генерирует новую строку для инициализированной машины состояний по исходной строке
+
+## Использование
+
+Два способа ролучения последовательностей,
+второй быстрее так как не требует удаления из входной последовательности пробелов и проверки на недопустимые символы
+
+```
+IdGen_State_Mashine A;
+	init_IdGen_State_Mashine(&A,"A1",2,"0",1,"DFGJMQV",7);
+	char *Str = "A1";
+	
+	for(int k=0;k<19*9*19*9*19*9;k++){
+		Str = identificator_generation(&A,Str);
+		if(A.err_code)break;
+		printf(" %s \n",Str);
+	}
+	
+	
+	
+	/*
+	for(int k=0;k<19*9*19*9*19*9;k++){
+		run_IdGen_State_Mashine(&A);
+		printf("%s \n", A.StartPtr);
+	}
+	*/
+```
+
 
